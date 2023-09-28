@@ -23,7 +23,7 @@ contador:
         la t2, vetor
 
         # Initialize the size of the array "vetor" in t3 (assuming it has 8 elements)
-        li t3, 8
+        li t3, 4
 
         # Loop to iterate through the array
         loop:
