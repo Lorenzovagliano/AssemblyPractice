@@ -1,0 +1,60 @@
+.data
+vetor: .word 14, 12, 14, 11 # exemplo
+
+##### START MODIFIQUE AQUI START #####
+scale_factor: .word 3  # This represents the fixed-point number 3
+scale_factor2: .word 2  # This represents the fixed-point number 2
+threshold: .word 20   # Define the threshold value here
+##### END MODIFIQUE AQUI END #####
+
+.text
+jal ra, main
+
+# utilizado para correção (considerando um limiar de 200 para o vetor de exemplo após a aplicação do reajuste).
+addi x14, x0, 3
+beq x14, s3, FIM # Verifica a quantidade de salários acima do limiar.
+
+main:
+    ##### START MODIFIQUE AQUI START #####
+    jal ra aplica_reajuste
+    jalr zero, (0)ra
+    ##### END MODIFIQUE AQUI END #####
+
+aplica_reajuste:
+    ##### START MODIFIQUE AQUI START #####
+
+    la t0, vetor        # Load the address of the vetor array into t0
+    add t1, x0, x0      # Initialize loop counter t1
+    addi t2, t1, 4      # Set t2 as the loop exit condition (number of elements in the array)
+    add x10, x0, x0      # Initialize a counter for elements greater than the threshold
+
+    L3:
+        lw t4, 0(t0)    # Load the current element into t4
+        lw t5, scale_factor  # Load the scale factor (3) into t5
+        lw a3, scale_factor2 # Load the scale factor2 (2) into a3
+
+        mul t4, t4, t5  # Multiply the element by the scale factor
+        div t4, t4, a3 # Divide the element by the scale factor2
+
+        lw t6, threshold  # Load the threshold value into s0 (use s registers for temporary storage)
+        bgt t4, t6, greater_than_threshold  # Check if the result is greater than the threshold
+
+        j not_greater_than_threshold
+
+    greater_than_threshold:
+        addi x10, x10, 1  # Increment the counter for elements greater than the threshold
+
+    not_greater_than_threshold:
+        sw t4, 0(t0)    # Store the result back into the array
+
+        addi t0, t0, 4  # Move to the next element in the vetor array
+        addi t1, t1, 1  # Increment the loop counter
+
+        bne t1, t2, L3  # Check if we've reached the end of the array, if not, continue the loop
+
+    # The modified vetor array now contains the elements multiplied by 1.5
+    # The counter in x10 contains the number of elements greater than the threshold
+
+
+##### END MODIFIQUE AQUI END #####
+FIM: addi x0, x0, 1
