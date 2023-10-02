@@ -1,5 +1,5 @@
-    .data
-vetor: .word 2 2 2 2
+.data
+vetor: .word 2 1 2 7
 
 ##### START MODIFIQUE AQUI START #####
 #
@@ -8,39 +8,38 @@ vetor: .word 2 2 2 2
 ##### END MODIFIQUE AQUI END #####
 
 .text
-jal x1, contador
-addi x14, x0, 2 # utilizado para correção
-beq x14, x5, FIM # Verifica # de pares
-beq x14, x6, FIM # Verifica # de ímpares
+jal x1, contador      # Jump to the contador function
+addi x14, x0, 2      # Load 2 into x14 for later comparison
+beq x14, x5, FIM     # Check if x5 (return address) equals 2, if true, exit (end of program)
+beq x14, x6, FIM     # Check if x6 (return address) equals 2, if true, exit (end of program)
 
 ##### START MODIFIQUE AQUI START #####
 contador:
-	la t2 , vetor
-    add t0, x0, x0
-    addi t3, t0, 4
+    la t2, vetor      # Load the address of the vetor array into t2
+    add t0, x0, x0   # Initialize loop counter t0
+    addi t3, t0, 4   # Set t3 as the loop exit condition (number of elements in the array)
     
-    li x10, 0  # Initialize even count to 0
-    li x11, 0  # Initialize odd count to 0
+    li x10, 0         # Initialize even count to 0
+    li x11, 0         # Initialize odd count to 0
     
     L3:
-    	lw t1, 0(t2)
+        lw t1, 0(t2)   # Load the current element from vetor into t1
         
-        andi t4, t1, 1
-        beqz t4, even
+        andi t4, t1, 1  # Check if the lowest bit is set (odd number)
+        beqz t4, even   # If it's not set (even number), jump to even label
         
-        addi x11, x11, 1
-        j next_element
+        addi x11, x11, 1  # Increment the odd count
+        j next_element    # Jump to next_element
         
     even:
-        addi x10, x10, 1
+        addi x10, x10, 1  # Increment the even count
         
     next_element:
-    	addi t2, t2, 4
-        addi t0, t0, 1
+        addi t2, t2, 4  # Move to the next element in the vetor array
+        addi t0, t0, 1  # Increment the loop counter
         
-        bne t0, t3, L3
+        bne t0, t3, L3  # Check if we've reached the end of the array, if not, continue the loop
    
-	
 ##### END MODIFIQUE AQUI END #####
 
-FIM: addi x0, x0, 1
+FIM: addi x0, x0, 1  # Increment x0 (end of program)
