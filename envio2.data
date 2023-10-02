@@ -52,6 +52,8 @@ aplica_reajuste:
 
         bne t1, t2, L3  # Check if we've reached the end of the array, if not, continue the loop
 
+	# jalr zero 0(ra) supostamente
+
     # The modified vetor array now contains the elements multiplied by 1.5
     # The counter in x10 contains the number of elements greater than the threshold
 

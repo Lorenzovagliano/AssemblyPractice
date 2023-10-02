@@ -39,6 +39,8 @@ contador:
         addi t0, t0, 1  # Increment the loop counter
         
         bne t0, t3, L3  # Check if we've reached the end of the array, if not, continue the loop
+        
+        # jalr zero 0(ra) Supostamente
    
 ##### END MODIFIQUE AQUI END #####
 
