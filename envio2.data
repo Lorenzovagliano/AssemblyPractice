@@ -1,62 +1,93 @@
-.data
-vetor: .word 14, 12, 14, 11 # exemplo
+.data 
 
-##### START MODIFIQUE AQUI START #####
+      vetor:  .word 200, 190, 340, 100 # exemplo 
+
+
+##### START MODIFIQUE AQUI START ##### 
 scale_factor: .word 3  # This represents the fixed-point number 3
 scale_factor2: .word 2  # This represents the fixed-point number 2
-threshold: .word 20   # Define the threshold value here
-##### END MODIFIQUE AQUI END #####
+threshold: .word 200   # Define the threshold value here
+##### END MODIFIQUE AQUI END ##### 
 
-.text
-jal ra, main
+.text     
 
-# utilizado para correção (considerando um limiar de 200 para o vetor de exemplo após a aplicação do reajuste).
-addi x14, x0, 3
-beq x14, s3, FIM # Verifica a quantidade de salários acima do limiar.
+    jal ra, main  
+
+# Ao final do reajuste (aplica_reajuste) você deve retornar o programa para a próxima instrução abaixo, que consiste na correção/verificação. 
+
+ ##### START INSTRUÇÃO DE CORREÇÃO/VERIFICAÇÃO ##### 
+
+   # utilizado para correção (considerando um limiar de 200 para o vetor de      exemplo após a aplicação do reajuste. 
+
+  
+
+addi a4, x0, 3 # configurando a quantidade de salários acima do limiar de 200. 
+  
+
+beq a4, t0, FIM # Verifica a quantidade de salários acima do limiar. 
+
+ 
+
+ ##### END INSTRUÇÃO DE CORREÇÃO/VERIFICAÇÃO ##### 
+
+ 
 
 main:
     ##### START MODIFIQUE AQUI START #####
+    addi sp, sp -4
+    sw ra, 0(sp)
+    
     jal ra aplica_reajuste
+    
+    lw ra 0(sp)
+    addi sp, sp, 4
     jalr zero, (0)ra
     ##### END MODIFIQUE AQUI END #####
 
 aplica_reajuste:
     ##### START MODIFIQUE AQUI START #####
+    addi sp, sp -4
+    sw ra, 0(sp)
 
-    la t0, vetor        # Load the address of the vetor array into t0
+    la a0, vetor        # Load the address of the vetor array into a0
     add t1, x0, x0      # Initialize loop counter t1
-    addi t2, t1, 4      # Set t2 as the loop exit condition (number of elements in the array)
-    add x10, x0, x0      # Initialize a counter for elements greater than the threshold
+    addi a1, x0, 4      # Set a1 as the loop exit condition (number of elements in the array)
+    add t0, x0, x0      # Initialize a counter for elements greater than the threshold
 
     L3:
-        lw t4, 0(t0)    # Load the current element into t4
+        lw t4, 0(a0)    # Load the current element into t4
         lw t5, scale_factor  # Load the scale factor (3) into t5
         lw a3, scale_factor2 # Load the scale factor2 (2) into a3
 
         mul t4, t4, t5  # Multiply the element by the scale factor
         div t4, t4, a3 # Divide the element by the scale factor2
 
-        lw t6, threshold  # Load the threshold value into s0 (use s registers for temporary storage)
-        bgt t4, t6, greater_than_threshold  # Check if the result is greater than the threshold
+        lw a2, threshold  # Load the threshold value into s0 (use s registers for temporary storage)
+        bgt t4, a2, greater_than_threshold  # Check if the result is greater than the threshold
 
         j not_greater_than_threshold
 
     greater_than_threshold:
-        addi x10, x10, 1  # Increment the counter for elements greater than the threshold
+        addi t0, t0, 1  # Increment the counter for elements greater than the threshold
 
     not_greater_than_threshold:
-        sw t4, 0(t0)    # Store the result back into the array
+        sw t4, 0(a0)    # Store the result back into the array
 
-        addi t0, t0, 4  # Move to the next element in the vetor array
+        addi a0, a0, 4  # Move to the next element in the vetor array
         addi t1, t1, 1  # Increment the loop counter
 
-        bne t1, t2, L3  # Check if we've reached the end of the array, if not, continue the loop
+        bne t1, a1, L3  # Check if we've reached the end of the array, if not, continue the loop
 
-	# jalr zero 0(ra) supostamente
+    lw ra 0(sp)
+    addi sp, sp, 4
 
+    jalr x0 0(ra)
     # The modified vetor array now contains the elements multiplied by 1.5
-    # The counter in x10 contains the number of elements greater than the threshold
+    # The counter in t0 contains the number of elements greater than the threshold
 
 
 ##### END MODIFIQUE AQUI END #####
-FIM: addi x0, x0, 1
+
+ 
+
+FIM: addi x0, x0, 1 

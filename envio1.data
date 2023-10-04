@@ -1,47 +1,77 @@
-.data
-vetor: .word 2 1 2 7
+.data 
 
-##### START MODIFIQUE AQUI START #####
-#
-# Este espaço é para você definir as suas constantes e vetores auxiliares.
-#
-##### END MODIFIQUE AQUI END #####
+vetor: .word 2 1 4 7 
 
-.text
-jal x1, contador      # Jump to the contador function
-addi x14, x0, 2      # Load 2 into x14 for later comparison
-beq x14, x5, FIM     # Check if x5 (return address) equals 2, if true, exit (end of program)
-beq x14, x6, FIM     # Check if x6 (return address) equals 2, if true, exit (end of program)
+ 
 
-##### START MODIFIQUE AQUI START #####
+##### START MODIFIQUE AQUI START ##### 
+
+# 
+
+# Este espaço é para você definir as suas constantes e vetores auxiliares. 
+
+# 
+##### END MODIFIQUE AQUI END ##### 
+
+ 
+
+.text 
+
+jal x1, contador 
+
+addi x14, x0, 2 # utilizado para correção 
+
+beq x14, x10, FIM # Verifica # de pares 
+
+beq x14, x11, FIM # Verifica # de ímpares 
+
+ 
+
+##### START MODIFIQUE AQUI START ##### 
+
 contador:
-    la t2, vetor      # Load the address of the vetor array into t2
-    add t0, x0, x0   # Initialize loop counter t0
-    addi t3, t0, 4   # Set t3 as the loop exit condition (number of elements in the array)
-    
-    li x10, 0         # Initialize even count to 0
-    li x11, 0         # Initialize odd count to 0
-    
-    L3:
-        lw t1, 0(t2)   # Load the current element from vetor into t1
-        
-        andi t4, t1, 1  # Check if the lowest bit is set (odd number)
-        beqz t4, even   # If it's not set (even number), jump to even label
-        
-        addi x11, x11, 1  # Increment the odd count
-        j next_element    # Jump to next_element
-        
-    even:
-        addi x10, x10, 1  # Increment the even count
-        
-    next_element:
-        addi t2, t2, 4  # Move to the next element in the vetor array
-        addi t0, t0, 1  # Increment the loop counter
-        
-        bne t0, t3, L3  # Check if we've reached the end of the array, if not, continue the loop
-        
-        # jalr zero 0(ra) Supostamente
-   
-##### END MODIFIQUE AQUI END #####
+		addi sp, sp -4
+        sw ra, 0(sp)
 
-FIM: addi x0, x0, 1  # Increment x0 (end of program)
+        # Initialize counters for even numbers (x10) and odd numbers (x11)
+        li x10, 0       # Initialize x10 with 0 to count even numbers
+        li x11, 0       # Initialize x11 with 0 to count odd numbers
+
+        # Initialize the address of the array "vetor" in t2
+        la t2, vetor
+
+        # Initialize the size of the array "vetor" in t3 (assuming it has 4 elements)
+        li t3, 4
+
+        # Loop to iterate through the array
+        loop:
+            lw t0, 0(t2)     # Load the current element from the array into t0
+            andi t1, t0, 1   # Check if the element is even (t0 & 1)
+            beqz t1, par     # If the result is zero (element is even), go to the "par" label
+
+            # If the element is odd, increment the odd number counter (x11)
+            addi x11, x11, 1
+            j next_iteration
+
+        par:
+            # If the element is even, increment the even number counter (x10)
+            addi x10, x10, 1
+
+        next_iteration:
+            addi t2, t2, 4   # Move to the next element in the array (4 bytes)
+            addi t3, t3, -1  # Decrement the remaining size of the array
+            bnez t3, loop    # If there are still elements in the array, continue the loop
+
+        # Return to the calling function
+        lw ra 0(sp)
+        addi sp, sp, 4
+        
+        jalr x0 0(ra)
+
+ 
+
+##### END MODIFIQUE AQUI END ##### 
+
+ 
+
+FIM: addi x0, x0, 1 
